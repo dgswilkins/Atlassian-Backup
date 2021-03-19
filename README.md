@@ -1,4 +1,15 @@
-### Description
+----
+
+### update 16/3/2021
+Automatic backup scheduling IS on Atlassian's list, although not in the very first horizon, as we are looking to completely overhaul the backup/restore experience.  Especially for those that have very large datasets.  With that said, there will be a mechanism available to automate this yourself, until we build that functionality into the UI. 
+
+* https://community.atlassian.com/t5/Backup-Restore/gh-p/backupandrestore
+
+Click the link, click request access, and we should get you in within 24 hours to review our strategy and provide feedback as we go. 
+
+----
+
+### DESCRIPTION
 
 In here you find sample backup scripts for taking automatic Cloud backups. 
 
