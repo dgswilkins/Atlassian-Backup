@@ -8,12 +8,12 @@ $cloud     = 'true' # Tells the script whether to export the backup for Cloud or
 $today       = Get-Date -format yyyyMMdd-hhm
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
 
-if(!(Test-Path -path $destination)){
-write-host "Folder is not present, creating folder"
-mkdir $destination #Make the path and folder is not present
+if(!(Test-Path -path $destination -PathType Container)){
+Write-Verbose "Folder is not present, creating folder"
+New-Item -ItemType Directory -Path $destination # create the Directory if it is not present
 }
 else{
-write-host "Path is already present"
+Write-Verbose "Path is already present"
 }
 
 #Convert credentials to base64 for REST API header
