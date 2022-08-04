@@ -50,7 +50,8 @@ if ($PSVersionTable.PSVersion.Major -lt 4) {
 try {
         $InitiateBackup = Invoke-RestMethod -Method Post -Headers $header -Uri $URI -ContentType $ContentType -Body $bodyjson -Verbose | ConvertTo-Json -Compress | Out-Null
 } catch {
-        $InitiateBackup = $_.Exception.Response.GetResponseStream()
+        $Exception = $_.Exception
+        $InitiateBackup = $Exception.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($InitiateBackup)
         $reader.BaseStream.Position = 0
         $reader.DiscardBufferedData()
