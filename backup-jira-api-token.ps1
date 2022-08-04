@@ -1,10 +1,43 @@
+#Requires -Module Microsoft.PowerShell.Utility
+# You can change the following defaults by altering the below settings:
+#
+# Set debug parameters
+#$MyWhatif = $False
+#$VerbosePreference = 'Continue'
 
-$account     = 'youratlassianjira' # Atlassian subdomain i.e. whateverproceeds.atlassian.net
-$username    = 'youratlassianusername' # username with domain something@domain.com
-$token    = 'youratlassianpassword' # Token created from product https://confluence.atlassian.com/cloud/api-tokens-938839638.html
-$destination = 'C:\Backups' # Location on server where script is run to dump the backup zip file.
-$attachments = 'false' # Tells the script whether or not to pull down the attachments as well
-$cloud     = 'true' # Tells the script whether to export the backup for Cloud or Server
+Function Get-Config {
+    [CmdletBinding()]
+    param(
+        [string]$fileName
+    )
+    Try {
+        Write-Verbose "Getting settings from $fileName"
+        $configuration = Get-Content $fileName -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        return $configuration
+    }
+    Catch {
+        Write-Verbose "Config file not found"
+        throw "Config File not found"
+    }
+}
+
+Try {
+    if ($PSScriptRoot.Length -eq 0) { $configRoot = "." } else { $configRoot = $PSScriptRoot }
+    $configPath = Join-Path $configRoot 'config.json'
+    $config = Get-Config $configPath
+}
+catch {
+    Write-Host "Config File not found"
+    Exit
+}
+
+$account     = $config.account # Atlassian subdomain i.e. whateverproceeds.atlassian.net
+$username    = $config.username # username with domain something@domain.com
+$token    = $config.token # Token created from product https://confluence.atlassian.com/cloud/api-tokens-938839638.html
+$destination = $config.destination # Location on server where script is run to dump the backup zip file.
+$attachments = $config.attachments # Tells the script whether or not to pull down the attachments as well
+$cloud     = $config.cloud # Tells the script whether to export the backup for Cloud or Server
+
 $today       = Get-Date -format yyyyMMdd-hhm
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
 
