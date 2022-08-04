@@ -36,7 +36,7 @@ if ($PSVersionTable.PSVersion.Major -lt 4) {
     throw "Script requires at least PowerShell version 4. Get it here: https://www.microsoft.com/en-us/download/details.aspx?id=40855"
 }
 
-# Create header for authentication
+Write-Verbose "Creating header for authup"
     [string]$ContentType = "application/json"
     [string]$URI = "https://$account.atlassian.net/rest/backup/1/export/runbackup"
 
@@ -46,7 +46,7 @@ if ($PSVersionTable.PSVersion.Major -lt 4) {
                 "Content-Type"="application/json"
                     }
 
-# Request backup
+Write-Verbose "Requesting backup"
 try {
         $InitiateBackup = Invoke-RestMethod -Method Post -Headers $header -Uri $URI -ContentType $ContentType -Body $bodyjson -Verbose | ConvertTo-Json -Compress | Out-Null
 } catch {
@@ -64,7 +64,7 @@ $GetBackupID = Invoke-WebRequest -Method Get -Headers $header https://$account.a
 $LatestBackupID = $GetBackupID.content
 
 
-# Wait for backup to finish
+Write-Verbose "Waiting for backup to finish"
 do {
     $status = Invoke-RestMethod -Method Get -Headers $header -Uri "https://$account.atlassian.net/rest/backup/1/export/getProgress?taskId=$LatestBackupID"
     $statusoutput = $status.result
@@ -88,6 +88,7 @@ if ([bool]($status.PSObject.Properties.Name -match "failedMessage")) {
 }
 
 $BackupDetails = $status.result
+Write-Verbose "Backup details: [$BackupDetails]"
 $BackupURI = "https://$account.atlassian.net/plugins/servlet/$BackupDetails"
 
 Invoke-WebRequest -Method Get -Headers $header -WebSession $session -Uri $BackupURI -OutFile (Join-Path -Path $destination -ChildPath "JIRA-backup-$today.zip")
