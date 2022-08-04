@@ -26,9 +26,6 @@ function ConvertTo-Base64($string) {
     $b64 = ConvertTo-Base64($username + ":" + $token);
     $auth = $b64;
 
-$string = "cbAttachments:true, exportToCloud:true"
-$stringbinary = [system.Text.Encoding]::Default.GetBytes($String) | %{[System.Convert]::ToString($_,2).PadLeft(8,'0') }
-
 $body = @{
           cbAttachments=$attachments
           exportToCloud=$cloud
