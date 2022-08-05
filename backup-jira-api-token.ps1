@@ -91,13 +91,11 @@ try {
         $reader.BaseStream.Position = 0
         $reader.DiscardBufferedData()
         $responseBody = $reader.ReadToEnd();
-}
+        $responseBody
+    }
 
-$responseBody
-
-$GetBackupID = Invoke-WebRequest -Method Get -Headers $header https://$account.atlassian.net/rest/backup/1/export/lastTaskId
+$GetBackupID = Invoke-WebRequest -Method Get -Headers $header "https://$account.atlassian.net/rest/backup/1/export/lastTaskId"
 $LatestBackupID = $GetBackupID.content
-
 
 Write-Verbose "Waiting for backup to finish"
 do {
