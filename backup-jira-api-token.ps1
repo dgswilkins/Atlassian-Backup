@@ -21,6 +21,13 @@ Function Get-Config {
     }
 }
 
+function ConvertTo-Base64($string) {
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($string);
+    $encoded = [System.Convert]::ToBase64String($bytes);
+    return $encoded;
+}
+
+# Start of Script
 Try {
     if ($PSScriptRoot.Length -eq 0) { $configRoot = "." } else { $configRoot = $PSScriptRoot }
     $configPath = Join-Path $configRoot 'config.json'
@@ -50,14 +57,8 @@ Write-Verbose "Path is already present"
 }
 
 #Convert credentials to base64 for REST API header
-function ConvertTo-Base64($string) {
-    $bytes = [System.Text.Encoding]::UTF8.GetBytes($string);
-    $encoded = [System.Convert]::ToBase64String($bytes);
-    return $encoded;
-    }
-
-    $b64 = ConvertTo-Base64($username + ":" + $token);
-    $auth = $b64;
+$b64 = ConvertTo-Base64($username + ":" + $token);
+$auth = $b64;
 
 $body = @{
           cbAttachments=$attachments
