@@ -47,6 +47,8 @@ $token    = $config.token # Token created from product https://confluence.atlass
 $destination = $config.destination # Location on server where script is run to dump the backup zip file.
 $attachments = $config.attachments # Tells the script whether or not to pull down the attachments as well
 $cloud     = $config.cloud # Tells the script whether to export the backup for Cloud or Server
+$daysBack = $config.daysBack # how many days of backups should we keep?
+
 $today       = Get-Date -format yyyyMMdd-hhm # used to name backup file
 
 # ensure we make calls with TLS 1.2
@@ -123,3 +125,7 @@ Write-Verbose "Backup details: [$BackupDetails]"
 $BackupURI = "https://$account.atlassian.net/plugins/servlet/$BackupDetails"
 
 Invoke-WebRequest -Method Get -Headers $header -WebSession $session -Uri $BackupURI -OutFile (Join-Path -Path $destination -ChildPath "JIRA-backup-$today.zip")
+
+Write-Verbose "Cleanup old files"
+$DatetoDelete = (Get-Date).AddDays(-$daysBack)
+Get-ChildItem $destination | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item
