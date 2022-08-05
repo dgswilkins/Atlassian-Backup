@@ -71,10 +71,6 @@ $body = @{
          }
 $bodyjson = $body | ConvertTo-Json
 
-if ($PSVersionTable.PSVersion.Major -lt 4) {
-    throw "Script requires at least PowerShell version 4. Get it here: https://www.microsoft.com/en-us/download/details.aspx?id=40855"
-}
-
 Write-Verbose "Creating header for authup"
     [string]$ContentType = "application/json"
     [string]$URI = "https://$account.atlassian.net/rest/backup/1/export/runbackup"
@@ -106,10 +102,6 @@ $LatestBackupID = $GetBackupID.content
 Write-Verbose "Waiting for backup to finish"
 do {
     $status = Invoke-RestMethod -Method Get -Headers $header -Uri "https://$account.atlassian.net/rest/backup/1/export/getProgress?taskId=$LatestBackupID"
-    $statusoutput = $status.result
-    $separator = ","
-    $option = [System.StringSplitOptions]::None
-    $s
 
     if ($status.progress -match "(\d+)") {
         $percentage = $Matches[1]
