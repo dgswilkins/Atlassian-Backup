@@ -5,6 +5,7 @@
 #$MyWhatif = $False
 #$VerbosePreference = 'Continue'
 
+# Helper functions
 Function Get-Config {
     [CmdletBinding()]
     param(
@@ -28,6 +29,8 @@ function ConvertTo-Base64($string) {
 }
 
 # Start of Script
+
+# get the configuration data
 Try {
     if ($PSScriptRoot.Length -eq 0) { $configRoot = "." } else { $configRoot = $PSScriptRoot }
     $configPath = Join-Path $configRoot 'config.json'
@@ -44,10 +47,12 @@ $token    = $config.token # Token created from product https://confluence.atlass
 $destination = $config.destination # Location on server where script is run to dump the backup zip file.
 $attachments = $config.attachments # Tells the script whether or not to pull down the attachments as well
 $cloud     = $config.cloud # Tells the script whether to export the backup for Cloud or Server
+$today       = Get-Date -format yyyyMMdd-hhm # used to name backup file
 
-$today       = Get-Date -format yyyyMMdd-hhm
+# ensure we make calls with TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
 
+# check for the destination path and create if not present
 if(!(Test-Path -path $destination -PathType Container)){
 Write-Verbose "Folder is not present, creating folder"
 New-Item -ItemType Directory -Path $destination # create the Directory if it is not present
@@ -116,11 +121,13 @@ do {
     Start-Sleep -Seconds 5
 } while($status.status -ne 'Success')
 
-# Download
+Write-Verbose "Downloading the backup file"
+# first check to see if the backup failed?
 if ([bool]($status.PSObject.Properties.Name -match "failedMessage")) {
     throw $status.failedMessage
 }
 
+# get the results 
 $BackupDetails = $status.result
 Write-Verbose "Backup details: [$BackupDetails]"
 $BackupURI = "https://$account.atlassian.net/plugins/servlet/$BackupDetails"
